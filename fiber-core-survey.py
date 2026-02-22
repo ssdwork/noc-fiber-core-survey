@@ -198,11 +198,11 @@ def main():
     ]
 
     # --- OFFICER INFO ---
-    st.markdown('<div class="section-head">কর্মকর্তার তথ্য</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-head">--- তথ্য প্রদানকারীর</div>', unsafe_allow_html=True)
     c1, c2, c3, c4 = st.columns(4)
-    with c1: name = st.text_input("তথ্য প্রদানকারী কর্মকর্তার নাম (Name) *", key="user_name") 
+    with c1: name = st.text_input("তথ্য প্রদানকারীর নাম (Name) *", key="user_name") 
     with c2:
-        user_contact = st.text_input("কর্মকর্তার যোগাযোগ নম্বর *", key="user_contact_input")
+        user_contact = st.text_input("যোগাযোগ নম্বর *", key="user_contact_input")
         if user_contact and (not user_contact.isdigit() or len(user_contact) != 11):
             st.warning("⚠️ নম্বরটি অবশ্যই ১১ ডিজিটের হতে হবে")
     with c3:
@@ -287,8 +287,8 @@ def main():
         officer_contact_valid = user_contact.isdigit() and len(user_contact) == 11 if user_contact else False
         
         missing_fields = []
-        if not name: missing_fields.append("তথ্য প্রদানকারী কর্মকর্তার নাম (Name) *")
-        if not user_contact: missing_fields.append("কর্মকর্তার যোগাযোগ নম্বর *")
+        if not name: missing_fields.append("তথ্য প্রদানকারীর নাম (Name) *")
+        if not user_contact: missing_fields.append("যোগাযোগ নম্বর *")
         if not designation: missing_fields.append("পদবী (Designation) *")
         if not workplace: missing_fields.append("কর্মস্থলের নাম (Workplace Name) *")
         if not final_div: missing_fields.append("বিভাগ (Division)")
@@ -307,7 +307,7 @@ def main():
         if missing_fields:
             st.error("দয়া করে নিচের তথ্যগুলো পূরণ করুন:\n" + ", ".join(missing_fields))
         elif not officer_contact_valid:
-            st.error("❌ কর্মকর্তার যোগাযোগ নম্বর সঠিক নয় (১১ ডিজিট ও শুধুমাত্র সংখ্যা হতে হবে)।")
+            st.error("❌ যোগাযোগ নম্বর সঠিক নয় (১১ ডিজিট ও শুধুমাত্র সংখ্যা হতে হবে)।")
         else:
             try:
                 records_to_save = []
@@ -315,7 +315,7 @@ def main():
                     records_to_save.append({
                         "Timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                         "নাম": name,
-                        "কর্মকর্তার যোগাযোগ নম্বর": user_contact,
+                        "যোগাযোগ নম্বর": user_contact,
                         "পদবী": designation,
                         "কর্মস্থল": workplace,
                         "বিভাগ": final_div,
@@ -341,7 +341,7 @@ def main():
                     updated_df = new_record
                 
                 expected_order = [
-                    "Timestamp", "নাম", "কর্মকর্তার যোগাযোগ নম্বর", "পদবী", "কর্মস্থল", 
+                    "Timestamp", "নাম", " যোগাযোগ নম্বর", "পদবী", "কর্মস্থল", 
                     "বিভাগ", "জেলা", "উপজেলা", "ইউনিয়ন", 
                     "কোম্পানির নাম", "উৎস (Source)", "উৎস কোর টাইপ", "উৎস দূরত্ব (KM)", 
                     "গন্তব্য (Destination)", "গন্তব্য কোর টাইপ", "গন্তব্য দূরত্ব (KM)", "ডিপেন্ডেন্সি (KM)"
