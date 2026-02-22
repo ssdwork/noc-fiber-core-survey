@@ -198,7 +198,7 @@ def main():
     ]
 
     # --- OFFICER INFO ---
-    st.markdown('<div class="section-head">--- তথ্য প্রদানকারীর</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-head"> তথ্য প্রদানকারী</div>', unsafe_allow_html=True)
     c1, c2, c3, c4 = st.columns(4)
     with c1: name = st.text_input("তথ্য প্রদানকারীর নাম (Name) *", key="user_name") 
     with c2:
