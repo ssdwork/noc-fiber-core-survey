@@ -81,7 +81,7 @@ st.markdown("""
     /* 1. Main Background */
     .stApp {
         background: linear-gradient(rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.95)),
-            url('https://static.vecteezy.com/system/resources/thumbnails/072/508/275/small/a-highly-detailed-shot-of-a-server-rack-s-back-panel-showing-the-organized-chaos-of-cables-and-ports-free-photo.jpg'); 
+            url('https://raw.githubusercontent.com/ssdwork/noc-fiber-core-survey/main/other%20resources/background%20image.webp'); 
         background-size: cover; background-position: center; background-attachment: fixed;
     }
 
