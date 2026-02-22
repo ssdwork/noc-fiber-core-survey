@@ -379,14 +379,14 @@ def main():
                 st.error(f"Error during submission: {e}")
 
     st.markdown("---")
-    st.markdown("""
-        <div style="display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 20px;">
-            <div style="color: #006400; font-size: 14px; font-weight: 700;">যোগাযোগের নম্বর:</div>
-            <div style="color: #000000;">+8801677891434</div>
-            <div style="color: #000000;">+8801712511005</div>
-            <div style="color: #000000;">+880255006823</div>
-        </div>
-    """, unsafe_allow_html=True)
+    # st.markdown("""
+    #     <div style="display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 20px;">
+    #         <div style="color: #006400; font-size: 14px; font-weight: 700;">যোগাযোগের নম্বর:</div>
+    #         <div style="color: #000000;">+8801677891434</div>
+    #         <div style="color: #000000;">+8801712511005</div>
+    #         <div style="color: #000000;">+880255006823</div>
+    #     </div>
+    # """, unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
