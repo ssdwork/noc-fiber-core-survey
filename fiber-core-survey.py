@@ -78,96 +78,113 @@ st.set_page_config(page_title="ফাইবার কোর কানেকশ�
 
 st.markdown("""
     <style>
-    /* 1. Main Background */
-    .stApp {
-        background: linear-gradient(rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.95)),
-            url('https://raw.githubusercontent.com/ssdwork/noc-fiber-core-survey/main/other%20resources/background%20image.webp'); 
-        background-size: cover; background-position: center; background-attachment: fixed;
+    /* 1. Global Styles */
+    :root {
+        --primary-color: #1E88E5; /* A modern, vibrant blue */
+        --secondary-color: #f5f5f5; /* A light gray for backgrounds */
+        --accent-color: #FFC107; /* A bright yellow for accents */
+        --text-color: #333333; /* A dark gray for text */
+        --font-family: 'Roboto', 'Nikosh', sans-serif;
     }
 
-    /* 2. Global Text Color */
+    /* 2. Main Background */
+    .stApp {
+        background-color: var(--secondary-color);
+    }
+
+    /* 3. Global Text Color */
     html, body, [class*="css"], .stMarkdown, p, label, .stTextInput > label, .stNumberInput > label { 
-        font-family: 'Calibri', 'Nikosh', sans-serif; 
-        color: #000000 !important; 
-        font-weight: 700 !important; 
-        font-size: 14px !important;
+        font-family: var(--font-family);
+        color: var(--text-color) !important; 
+        font-weight: 400 !important; 
+        font-size: 16px !important;
     }
     
-    /* 3. Headers */
-    h1, h2, h3, h4 { color: #000000 !important; }
+    /* 4. Headers */
+    h1, h2, h3, h4 { 
+        color: var(--primary-color) !important; 
+        font-weight: 700 !important;
+    }
 
-    /* 4. Input Fields */
+    /* 5. Input Fields */
     div[data-baseweb="input"] input, 
     div[data-baseweb="select"] div,
     div[data-baseweb="select"] span,
     div[data-baseweb="base-input"] {
-        color: #000000 !important; 
-        -webkit-text-fill-color: #000000 !important;
-        font-family: 'Calibri', 'Nikosh', sans-serif !important;
+        color: var(--text-color) !important; 
+        -webkit-text-fill-color: var(--text-color) !important;
+        font-family: var(--font-family) !important;
         font-weight: 400 !important;
     }
 
     div[data-baseweb="input"], 
     div[data-baseweb="select"] { 
         background-color: #FFFFFF !important; 
-        border: 1px solid #006400 !important; 
+        border: 1px solid #cccccc !important; 
         border-radius: 8px !important; 
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
     
-    /* Dropdown Options */
-    ul[data-baseweb="menu"], div[data-baseweb="popover"] { background-color: #FFFFFF !important; }
-    li[data-baseweb="option"] { color: #000000 !important; }
+    /* 6. Dropdown Options */
+    ul[data-baseweb="menu"], div[data-baseweb="popover"] { 
+        background-color: #FFFFFF !important; 
+        border-radius: 8px;
+    }
+    li[data-baseweb="option"] { 
+        color: var(--text-color) !important; 
+        font-weight: 400 !important;
+    }
 
-    /* 5. Buttons */
+    /* 7. Buttons */
     div.stButton > button { 
-        color: #006400 !important; 
-        border: 1px solid #006400 !important; 
+        color: var(--primary-color) !important; 
+        border: 1px solid var(--primary-color) !important; 
         background-color: #FFFFFF !important; 
         font-weight: 600 !important; 
-        border-radius: 6px !important;
+        border-radius: 8px !important;
+        transition: all 0.2s ease-in-out;
     }
     div.stButton > button:hover {
-        background-color: #006400 !important;
+        background-color: var(--primary-color) !important;
         color: #FFFFFF !important;
     }
     div.stButton > button[kind="primary"] { 
-        background: linear-gradient(to bottom, #007bff, #0056b3) !important; 
+        background: var(--primary-color) !important; 
         color: #FFFFFF !important; 
         border: none !important;
     }
 
-    /* 6. Custom Classes */
+    /* 8. Custom Classes */
     .main-title { 
-        color: #006400 !important; 
+        color: var(--primary-color) !important; 
         text-align: center; 
-        font-size: 1.4rem !important; 
+        font-size: 2.5rem !important; 
         font-weight: 700; 
-        border-bottom: 3px solid #F42A41; 
-        padding-bottom: 5px; 
-        display: inline-block;
+        padding-bottom: 10px; 
     }
     .section-head { 
-        color: #006400 !important; 
-        font-family: 'Calibri', 'Nikosh', sans-serif;
+        color: var(--primary-color) !important; 
+        font-family: var(--font-family);
         font-weight: 700; 
-        margin: 15px 0 5px 0; 
-        border-bottom: 2px solid #006400; 
-        font-size: 16px !important;
+        margin: 20px 0 10px 0; 
+        border-bottom: 2px solid var(--primary-color); 
+        font-size: 1.5rem !important;
         padding-bottom: 5px;
     }
     .fiber-block {
-        background: #f1f8e9;
-        padding: 15px;
+        background: #FFFFFF;
+        padding: 20px;
         border-radius: 8px;
-        border: 1px solid #c5e1a5;
-        margin-bottom: 15px;
+        border: 1px solid #e0e0e0;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
     
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header[data-testid="stHeader"] { background-color: rgba(0,0,0,0) !important; }
     </style>
-""", unsafe_allow_html=True)
+""",unsafe_allow_html=True)
 
 def main():
     conn = st.connection("gsheets", type=GSheetsConnection)
@@ -378,15 +395,6 @@ def main():
             except Exception as e:
                 st.error(f"Error during submission: {e}")
 
-    st.markdown("---")
-    # st.markdown("""
-    #     <div style="display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 20px;">
-    #         <div style="color: #006400; font-size: 14px; font-weight: 700;">যোগাযোগের নম্বর:</div>
-    #         <div style="color: #000000;">+8801677891434</div>
-    #         <div style="color: #000000;">+8801712511005</div>
-    #         <div style="color: #000000;">+880255006823</div>
-    #     </div>
-    # """, unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
