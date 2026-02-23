@@ -178,7 +178,7 @@ def main():
                 <img src="https://raw.githubusercontent.com/ssdwork/bd-broadband-survey/main/Ict Division Logo Vector.svg" style="height: 70px; width: auto;" title="ICT Division">
             </div>
             <div style="flex: 1; text-align: center;">
-                <div class="main-title"> ফাইবার কোর কানেকশন জরিপ</div>
+                <div class="main-title"> ফাইবার কানেকশন জরিপ</div>
             </div>
             <div style="flex: 0 0 100px; text-align: right;">
                 <img src="https://raw.githubusercontent.com/ssdwork/bd-broadband-survey/main/Bangladesh_Computer_Council_Logo.svg" style="height: 45px; width: auto;" title="Bangladesh Computer Council">
