@@ -231,7 +231,6 @@ def main():
     st.markdown('<div class="section-head">ফাইবার কোর কানেকশনের তথ্য</div>', unsafe_allow_html=True)
     
     core_type_opts = ["-- নির্বাচন করুন --", "48", "24", "12"]
-    company_opts = ["-- নির্বাচন করুন --", "Fiber@Home", "Summit"]
     
     fiber_records = []
 
@@ -239,11 +238,7 @@ def main():
         st.markdown(f'<div class="fiber-block">', unsafe_allow_html=True)
         st.markdown(f"#### ফাইবার লাইন - {i+1}")
         
-        fc1, fc2 = st.columns(2)
-        with fc1:
-            comp_name = st.selectbox(f"কোম্পানির নাম (Company) *", company_opts, key=f"comp_{i}")
-        with fc2:
-            dep_km = st.number_input(f"ডিপেন্ডেন্সি / Dependency (KM) *", min_value=0.0, step=0.1, key=f"dep_{i}")
+        dep_km = st.number_input(f"ডিপেন্ডেন্সি / Dependency (KM) *", min_value=0.0, step=0.1, key=f"dep_{i}")
 
         st.markdown("**উৎস (Source) এর তথ্য:**")
         s1, s2, s3 = st.columns(3)
@@ -260,7 +255,7 @@ def main():
         st.markdown('</div>', unsafe_allow_html=True)
 
         fiber_records.append({
-            "company": comp_name, "dep_km": dep_km,
+            "dep_km": dep_km,
             "s_name": s_name, "s_core": s_core, "s_dist": s_dist,
             "d_name": d_name, "d_core": d_core, "d_dist": d_dist
         })
@@ -297,7 +292,6 @@ def main():
 
         # Validate Fiber fields
         for idx, rec in enumerate(fiber_records):
-            if rec["company"] == "-- নির্বাচন করুন --": missing_fields.append(f"কোম্পানির নাম (Company) * (লাইন {idx+1})")
             if not rec["s_name"]: missing_fields.append(f"উৎস (Source Name) * (লাইন {idx+1})")
             if rec["s_core"] == "-- নির্বাচন করুন --": missing_fields.append(f"উৎস কোর টাইপ * (লাইন {idx+1})")
             if not rec["d_name"]: missing_fields.append(f"গন্তব্য (Destination Name) * (লাইন {idx+1})")
@@ -321,7 +315,6 @@ def main():
                         "জেলা": final_dist,
                         "উপজেলা": final_upz,
                         "ইউনিয়ন": final_uni,
-                        "কোম্পানির নাম": rec["company"],
                         "উৎস (Source)": rec["s_name"],
                         "উৎস কোর টাইপ": rec["s_core"],
                         "উৎস দূরত্ব (KM)": rec["s_dist"],
@@ -342,7 +335,7 @@ def main():
                 expected_order = [
                     "Timestamp", "নাম", " যোগাযোগ নম্বর", "পদবী", "কর্মস্থল", 
                     "বিভাগ", "জেলা", "উপজেলা", "ইউনিয়ন", 
-                    "কোম্পানির নাম", "উৎস (Source)", "উৎস কোর টাইপ", "উৎস দূরত্ব (KM)", 
+                    "উৎস (Source)", "উৎস কোর টাইপ", "উৎস দূরত্ব (KM)", 
                     "গন্তব্য (Destination)", "গন্তব্য কোর টাইপ", "গন্তব্য দূরত্ব (KM)", "ডিপেন্ডেন্সি (KM)"
                 ]
                 
@@ -369,7 +362,7 @@ def main():
                 # Clear Session State for Fiber records
                 current_keys = list(st.session_state.keys())
                 for key in current_keys:
-                    if any(prefix in key for prefix in ["comp_", "dep_", "s_name_", "s_core_", "s_dist_", "d_name_", "d_core_", "d_dist_", "geo_uni_main"]):
+                    if any(prefix in key for prefix in ["dep_", "s_name_", "s_core_", "s_dist_", "d_name_", "d_core_", "d_dist_", "geo_uni_main"]):
                         del st.session_state[key]
                 st.session_state.fiber_rows = 1
 
@@ -379,14 +372,14 @@ def main():
                 st.error(f"Error during submission: {e}")
 
     st.markdown("---")
-    # st.markdown("""
-    #     <div style="display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 20px;">
-    #         <div style="color: #006400; font-size: 14px; font-weight: 700;">যোগাযোগের নম্বর:</div>
-    #         <div style="color: #000000;">+8801677891434</div>
-    #         <div style="color: #000000;">+8801712511005</div>
-    #         <div style="color: #000000;">+880255006823</div>
-    #     </div>
-    # """, unsafe_allow_html=True)
+    st.markdown("""
+        <div style="display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 20px;">
+            <div style="color: #006400; font-size: 14px; font-weight: 700;">যোগাযোগের নম্বর:</div>
+            <div style="color: #000000;">+8801677891434</div>
+            <div style="color: #000000;">+8801712511005</div>
+            <div style="color: #000000;">+880255006823</div>
+        </div>
+    """, unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
