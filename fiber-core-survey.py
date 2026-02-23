@@ -235,13 +235,10 @@ def main():
             uni_opts = BD_DATA[final_div][final_dist][final_upz] if (final_div in BD_DATA and final_dist in BD_DATA[final_div] and final_upz in BD_DATA[final_div][final_dist]) else []
             final_uni = smart_geo_input('ইউনিয়ন (Union)', uni_opts, f'geo_uni_{i}')
 
-        st.markdown("**উৎস (Source) এর তথ্য:**")
         s1, s2, s3 = st.columns(3)
         with s1: s_name = st.text_input("উৎস (Source Name) *", key=f"s_name_{i}")
         with s2: s_core = st.selectbox("উৎস কোর টাইপ *", core_type_opts, key=f"s_core_{i}")
         with s3: s_dist = st.number_input("উৎস দূরত্ব / Distance (KM) *", min_value=0.0, step=0.1, key=f"s_dist_{i}")
-
-        dep_km = st.number_input(f"ডিপেন্ডেন্সি / Dependency (KM) *", min_value=0.0, step=0.1, key=f"dep_{i}")
 
         st.markdown('<div class="section-head">গন্তব্য এলাকার তথ্য</div>', unsafe_allow_html=True)
         gd1, gd2, gd3, gd4 = st.columns(4)
@@ -258,12 +255,13 @@ def main():
             d_uni_opts = BD_DATA[d_final_div][d_final_dist][d_final_upz] if (d_final_div in BD_DATA and d_final_dist in BD_DATA[d_final_div] and d_final_upz in BD_DATA[d_final_div][d_final_dist]) else []
             d_final_uni = smart_geo_input('ইউনিয়ন (Union)', d_uni_opts, f'd_geo_uni_{i}')
 
-        st.markdown("**গন্তব্য (Destination) এর তথ্য:**")
         d1, d2, d3 = st.columns(3)
         with d1: d_name = st.text_input("গন্তব্য (Destination Name) *", key=f"d_name_{i}")
         with d2: d_core = st.selectbox("গন্তব্য কোর টাইপ *", core_type_opts, key=f"d_core_{i}")
         with d3: d_dist = st.number_input("গন্তব্য দূরত্ব / Distance (KM) *", min_value=0.0, step=0.1, key=f"d_dist_{i}")
         
+        dep_km = st.number_input(f"ডিপেন্ডেন্সি / Dependency (KM) *", min_value=0.0, step=0.1, key=f"dep_{i}")
+
         st.markdown('</div>', unsafe_allow_html=True)
 
         fiber_records.append({
