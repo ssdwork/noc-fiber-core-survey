@@ -219,6 +219,12 @@ def main():
         st.markdown(f'<div class="fiber-block">', unsafe_allow_html=True)
         st.markdown(f"#### ফাইবার লাইন - {i+1}")
         
+        st.markdown("**উৎস (Source) এর তথ্য:**")
+        s1, s2, s3 = st.columns(3)
+        with s1: s_name = st.text_input("উৎস (Source Name) *", key=f"s_name_{i}")
+        with s2: s_core = st.selectbox("উৎস কোর টাইপ *", core_type_opts, key=f"s_core_{i}")
+        with s3: s_dist = st.number_input("উৎস দূরত্ব / Distance (KM) *", min_value=0.0, step=0.1, key=f"s_dist_{i}")
+
         # --- GEOGRAPHY INFO ---
         st.markdown('<div class="section-head">এলাকার তথ্য</div>', unsafe_allow_html=True)
         g1, g2, g3, g4 = st.columns(4)
@@ -237,11 +243,20 @@ def main():
 
         dep_km = st.number_input(f"ডিপেন্ডেন্সি / Dependency (KM) *", min_value=0.0, step=0.1, key=f"dep_{i}")
 
-        st.markdown("**উৎস (Source) এর তথ্য:**")
-        s1, s2, s3 = st.columns(3)
-        with s1: s_name = st.text_input("উৎস (Source Name) *", key=f"s_name_{i}")
-        with s2: s_core = st.selectbox("উৎস কোর টাইপ *", core_type_opts, key=f"s_core_{i}")
-        with s3: s_dist = st.number_input("উৎস দূরত্ব / Distance (KM) *", min_value=0.0, step=0.1, key=f"s_dist_{i}")
+        st.markdown('<div class="section-head">গন্তব্য এলাকার তথ্য</div>', unsafe_allow_html=True)
+        gd1, gd2, gd3, gd4 = st.columns(4)
+        with gd1:
+            d_div_list = list(BD_DATA.keys())
+            d_final_div = smart_geo_input('বিভাগ (Division)', d_div_list, f'd_geo_div_{i}')
+        with gd2:
+            d_dist_opts = list(BD_DATA[d_final_div].keys()) if d_final_div in BD_DATA else []
+            d_final_dist = smart_geo_input('জেলা (District)', d_dist_opts, f'd_geo_dist_{i}')
+        with gd3:
+            d_upz_opts = list(BD_DATA[d_final_div][d_final_dist].keys()) if (d_final_div in BD_DATA and d_final_dist in BD_DATA[d_final_div]) else []
+            d_final_upz = smart_geo_input('উপজেলা (Upazila)', d_upz_opts, f'd_geo_upz_{i}')
+        with gd4:
+            d_uni_opts = BD_DATA[d_final_div][d_final_dist][d_final_upz] if (d_final_div in BD_DATA and d_final_dist in BD_DATA[d_final_div] and d_final_upz in BD_DATA[d_final_div][d_final_dist]) else []
+            d_final_uni = smart_geo_input('ইউনিয়ন (Union)', d_uni_opts, f'd_geo_uni_{i}')
 
         st.markdown("**গন্তব্য (Destination) এর তথ্য:**")
         d1, d2, d3 = st.columns(3)
@@ -253,6 +268,7 @@ def main():
 
         fiber_records.append({
             "div": final_div, "dist": final_dist, "upz": final_upz, "uni": final_uni,
+            "d_div": d_final_div, "d_dist": d_final_dist, "d_upz": d_final_upz, "d_uni": d_final_uni,
             "dep_km": dep_km,
             "s_name": s_name, "s_core": s_core, "s_dist": s_dist,
             "d_name": d_name, "d_core": d_core, "d_dist": d_dist
@@ -290,6 +306,10 @@ def main():
             if not rec["dist"]: missing_fields.append(f"জেলা (District) (লাইন {idx+1})")
             if not rec["upz"]: missing_fields.append(f"উপজেলা (Upazila) (লাইন {idx+1})")
             if not rec["uni"]: missing_fields.append(f"ইউনিয়ন (Union) (লাইন {idx+1})")
+            if not rec["d_div"]: missing_fields.append(f"গন্তব্য বিভাগ (Division) (লাইন {idx+1})")
+            if not rec["d_dist"]: missing_fields.append(f"গন্তব্য জেলা (District) (লাইন {idx+1})")
+            if not rec["d_upz"]: missing_fields.append(f"গন্তব্য উপজেলা (Upazila) (লাইন {idx+1})")
+            if not rec["d_uni"]: missing_fields.append(f"গন্তব্য ইউনিয়ন (Union) (লাইন {idx+1})")
             if not rec["s_name"]: missing_fields.append(f"উৎস (Source Name) * (লাইন {idx+1})")
             if rec["s_core"] == "-- নির্বাচন করুন --": missing_fields.append(f"উৎস কোর টাইপ * (লাইন {idx+1})")
             if not rec["d_name"]: missing_fields.append(f"গন্তব্য (Destination Name) * (লাইন {idx+1})")
@@ -313,6 +333,10 @@ def main():
                         "জেলা": rec["dist"],
                         "উপজেলা": rec["upz"],
                         "ইউনিয়ন": rec["uni"],
+                        "গন্তব্য বিভাগ": rec["d_div"],
+                        "গন্তব্য জেলা": rec["d_dist"],
+                        "গন্তব্য উপজেলা": rec["d_upz"],
+                        "গন্তব্য ইউনিয়ন": rec["d_uni"],
                         "উৎস (Source)": rec["s_name"],
                         "উৎস কোর টাইপ": rec["s_core"],
                         "উৎস দূরত্ব (KM)": rec["s_dist"],
@@ -333,6 +357,7 @@ def main():
                 expected_order = [
                     "Timestamp", "নাম", "যোগাযোগ নম্বর", "পদবী", "কর্মস্থল", 
                     "বিভাগ", "জেলা", "উপজেলা", "ইউনিয়ন", 
+                    "গন্তব্য বিভাগ", "গন্তব্য জেলা", "গন্তব্য উপজেলা", "গন্তব্য ইউনিয়ন",
                     "উৎস (Source)", "উৎস কোর টাইপ", "উৎস দূরত্ব (KM)", 
                     "গন্তব্য (Destination)", "গন্তব্য কোর টাইপ", "গন্তব্য দূরত্ব (KM)", "ডিপেন্ডেন্সি (KM)"
                 ]
@@ -360,7 +385,7 @@ def main():
                 # Clear Session State for Fiber records
                 current_keys = list(st.session_state.keys())
                 for key in current_keys:
-                    if any(prefix in key for prefix in ["dep_", "s_name_", "s_core_", "s_dist_", "d_name_", "d_core_", "d_dist_", "geo_div_", "geo_dist_", "geo_upz_", "geo_uni_"]):
+                    if any(prefix in key for prefix in ["dep_", "s_name_", "s_core_", "s_dist_", "d_name_", "d_core_", "d_dist_", "geo_div_", "geo_dist_", "geo_upz_", "geo_uni_", "d_geo_div_", "d_geo_dist_", "d_geo_upz_", "d_geo_uni_"]):
                         del st.session_state[key]
                 st.session_state.fiber_rows = 1
 
