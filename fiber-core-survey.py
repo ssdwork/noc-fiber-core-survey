@@ -211,22 +211,6 @@ def main():
         else: designation = selected_desig
     with c4: workplace = st.text_input("কর্মস্থলের নাম (Workplace Name) *", key="workplace_input")
 
-    # --- GEOGRAPHY INFO ---
-    st.markdown('<div class="section-head">এলাকার তথ্য</div>', unsafe_allow_html=True)
-    g1, g2, g3, g4 = st.columns(4)
-    with g1:
-        div_list = list(BD_DATA.keys())
-        final_div = smart_geo_input('বিভাগ (Division)', div_list, 'geo_div')
-    with g2:
-        dist_opts = list(BD_DATA[final_div].keys()) if final_div in BD_DATA else []
-        final_dist = smart_geo_input('জেলা (District)', dist_opts, 'geo_dist')
-    with g3:
-        upz_opts = list(BD_DATA[final_div][final_dist].keys()) if (final_div in BD_DATA and final_dist in BD_DATA[final_div]) else []
-        final_upz = smart_geo_input('উপজেলা (Upazila)', upz_opts, 'geo_upz')
-    with g4:
-        uni_opts = BD_DATA[final_div][final_dist][final_upz] if (final_div in BD_DATA and final_dist in BD_DATA[final_div] and final_upz in BD_DATA[final_div][final_dist]) else []
-        final_uni = smart_geo_input('ইউনিয়ন (Union)', uni_opts, 'geo_uni_main')
-
     # --- FIBER CONNECTION INFO ---
     st.markdown('<div class="section-head">ফাইবার কোর কানেকশনের তথ্য</div>', unsafe_allow_html=True)
     
@@ -238,6 +222,22 @@ def main():
         st.markdown(f'<div class="fiber-block">', unsafe_allow_html=True)
         st.markdown(f"#### ফাইবার লাইন - {i+1}")
         
+        # --- GEOGRAPHY INFO ---
+        st.markdown('<div class="section-head">এলাকার তথ্য</div>', unsafe_allow_html=True)
+        g1, g2, g3, g4 = st.columns(4)
+        with g1:
+            div_list = list(BD_DATA.keys())
+            final_div = smart_geo_input('বিভাগ (Division)', div_list, f'geo_div_{i}')
+        with g2:
+            dist_opts = list(BD_DATA[final_div].keys()) if final_div in BD_DATA else []
+            final_dist = smart_geo_input('জেলা (District)', dist_opts, f'geo_dist_{i}')
+        with g3:
+            upz_opts = list(BD_DATA[final_div][final_dist].keys()) if (final_div in BD_DATA and final_dist in BD_DATA[final_div]) else []
+            final_upz = smart_geo_input('উপজেলা (Upazila)', upz_opts, f'geo_upz_{i}')
+        with g4:
+            uni_opts = BD_DATA[final_div][final_dist][final_upz] if (final_div in BD_DATA and final_dist in BD_DATA[final_div] and final_upz in BD_DATA[final_div][final_dist]) else []
+            final_uni = smart_geo_input('ইউনিয়ন (Union)', uni_opts, f'geo_uni_{i}')
+
         dep_km = st.number_input(f"ডিপেন্ডেন্সি / Dependency (KM) *", min_value=0.0, step=0.1, key=f"dep_{i}")
 
         st.markdown("**উৎস (Source) এর তথ্য:**")
@@ -255,6 +255,7 @@ def main():
         st.markdown('</div>', unsafe_allow_html=True)
 
         fiber_records.append({
+            "div": final_div, "dist": final_dist, "upz": final_upz, "uni": final_uni,
             "dep_km": dep_km,
             "s_name": s_name, "s_core": s_core, "s_dist": s_dist,
             "d_name": d_name, "d_core": d_core, "d_dist": d_dist
@@ -285,13 +286,13 @@ def main():
         if not user_contact: missing_fields.append("যোগাযোগ নম্বর *")
         if not designation: missing_fields.append("পদবী (Designation) *")
         if not workplace: missing_fields.append("কর্মস্থলের নাম (Workplace Name) *")
-        if not final_div: missing_fields.append("বিভাগ (Division)")
-        if not final_dist: missing_fields.append("জেলা (District)")
-        if not final_upz: missing_fields.append("উপজেলা (Upazila)")
-        if not final_uni: missing_fields.append("ইউনিয়ন (Union)")
 
         # Validate Fiber fields
         for idx, rec in enumerate(fiber_records):
+            if not rec["div"]: missing_fields.append(f"বিভাগ (Division) (লাইন {idx+1})")
+            if not rec["dist"]: missing_fields.append(f"জেলা (District) (লাইন {idx+1})")
+            if not rec["upz"]: missing_fields.append(f"উপজেলা (Upazila) (লাইন {idx+1})")
+            if not rec["uni"]: missing_fields.append(f"ইউনিয়ন (Union) (লাইন {idx+1})")
             if not rec["s_name"]: missing_fields.append(f"উৎস (Source Name) * (লাইন {idx+1})")
             if rec["s_core"] == "-- নির্বাচন করুন --": missing_fields.append(f"উৎস কোর টাইপ * (লাইন {idx+1})")
             if not rec["d_name"]: missing_fields.append(f"গন্তব্য (Destination Name) * (লাইন {idx+1})")
@@ -311,10 +312,10 @@ def main():
                         "যোগাযোগ নম্বর": user_contact,
                         "পদবী": designation,
                         "কর্মস্থল": workplace,
-                        "বিভাগ": final_div,
-                        "জেলা": final_dist,
-                        "উপজেলা": final_upz,
-                        "ইউনিয়ন": final_uni,
+                        "বিভাগ": rec["div"],
+                        "জেলা": rec["dist"],
+                        "উপজেলা": rec["upz"],
+                        "ইউনিয়ন": rec["uni"],
                         "উৎস (Source)": rec["s_name"],
                         "উৎস কোর টাইপ": rec["s_core"],
                         "উৎস দূরত্ব (KM)": rec["s_dist"],
@@ -362,7 +363,7 @@ def main():
                 # Clear Session State for Fiber records
                 current_keys = list(st.session_state.keys())
                 for key in current_keys:
-                    if any(prefix in key for prefix in ["dep_", "s_name_", "s_core_", "s_dist_", "d_name_", "d_core_", "d_dist_", "geo_uni_main"]):
+                    if any(prefix in key for prefix in ["dep_", "s_name_", "s_core_", "s_dist_", "d_name_", "d_core_", "d_dist_", "geo_div_", "geo_dist_", "geo_upz_", "geo_uni_"]):
                         del st.session_state[key]
                 st.session_state.fiber_rows = 1
 
