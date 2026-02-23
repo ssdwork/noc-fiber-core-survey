@@ -213,11 +213,8 @@ def main():
 
     # --- FIBER CONNECTION INFO ---
     st.markdown('<div class="section-head">ফাইবার কোর কানেকশনের তথ্য</div>', unsafe_allow_html=True)
-    
     core_type_opts = ["-- নির্বাচন করুন --", "48", "24", "12"]
-    
     fiber_records = []
-
     for i in range(st.session_state.fiber_rows):
         st.markdown(f'<div class="fiber-block">', unsafe_allow_html=True)
         st.markdown(f"#### ফাইবার লাইন - {i+1}")
