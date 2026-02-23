@@ -219,14 +219,8 @@ def main():
         st.markdown(f'<div class="fiber-block">', unsafe_allow_html=True)
         st.markdown(f"#### ফাইবার লাইন - {i+1}")
         
-        st.markdown("**উৎস (Source) এর তথ্য:**")
-        s1, s2, s3 = st.columns(3)
-        with s1: s_name = st.text_input("উৎস (Source Name) *", key=f"s_name_{i}")
-        with s2: s_core = st.selectbox("উৎস কোর টাইপ *", core_type_opts, key=f"s_core_{i}")
-        with s3: s_dist = st.number_input("উৎস দূরত্ব / Distance (KM) *", min_value=0.0, step=0.1, key=f"s_dist_{i}")
-
         # --- GEOGRAPHY INFO ---
-        st.markdown('<div class="section-head">এলাকার তথ্য</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-head">উৎস এলাকার তথ্য...</div>', unsafe_allow_html=True)
         g1, g2, g3, g4 = st.columns(4)
         with g1:
             div_list = list(BD_DATA.keys())
@@ -240,6 +234,12 @@ def main():
         with g4:
             uni_opts = BD_DATA[final_div][final_dist][final_upz] if (final_div in BD_DATA and final_dist in BD_DATA[final_div] and final_upz in BD_DATA[final_div][final_dist]) else []
             final_uni = smart_geo_input('ইউনিয়ন (Union)', uni_opts, f'geo_uni_{i}')
+
+        st.markdown("**উৎস (Source) এর তথ্য:**")
+        s1, s2, s3 = st.columns(3)
+        with s1: s_name = st.text_input("উৎস (Source Name) *", key=f"s_name_{i}")
+        with s2: s_core = st.selectbox("উৎস কোর টাইপ *", core_type_opts, key=f"s_core_{i}")
+        with s3: s_dist = st.number_input("উৎস দূরত্ব / Distance (KM) *", min_value=0.0, step=0.1, key=f"s_dist_{i}")
 
         dep_km = st.number_input(f"ডিপেন্ডেন্সি / Dependency (KM) *", min_value=0.0, step=0.1, key=f"dep_{i}")
 
