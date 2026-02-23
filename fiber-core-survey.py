@@ -191,7 +191,7 @@ def main():
 
     desig_list = [
         "প্রোগ্রামার", "মেইনটেন্যান্স ইঞ্জিনিয়ার", 
-        "নেটওয়ার্ক ইঞ্জিনিয়ার", "সহকারী প্রোগ্রামার", 
+        "নেটওয়ার্ক ইঞ্জিনিয়ার", "সহকারী পরিচালক", "সহকারী প্রোগ্রামার", 
         "সহকারী মেইনটেন্যান্স ইঞ্জিনিয়ার", "সহকারী নেটওয়ার্ক ইঞ্জিনিয়ার", 
         "ওয়েবসাইট এ্যাডমিনিস্ট্রেটর"
     ]
@@ -393,15 +393,14 @@ def main():
                 st.error(f"Error during submission: {e}")
 
     st.markdown("---")
-    st.markdown("""
-        <div style="display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 20px;">
-            <div style="color: #006400; font-size: 14px; font-weight: 700;">যোগাযোগের নম্বর:</div>
-            <div style="color: #000000;">+8801677891434</div>
-            <div style="color: #000000;">+8801712511005</div>
-            <div style="color: #000000;">+880255006823</div>
-        </div>
+    #st.markdown("""
+     #   <div style="display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 20px;">
+      #      <div style="color: #006400; font-size: 14px; font-weight: 700;">যোগাযোগের নম্বর:</div>
+       #     <div style="color: #000000;">+8801677891434</div>
+        #    <div style="color: #000000;">+8801712511005</div>
+         #   <div style="color: #000000;">+880255006823</div>
+        #</div>
     """, unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
-
