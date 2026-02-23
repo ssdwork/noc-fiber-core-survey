@@ -188,6 +188,8 @@ def main():
 
     if 'fiber_rows' not in st.session_state:
         st.session_state.fiber_rows = 1
+    if 'point_rows' not in st.session_state:
+        st.session_state.point_rows = {}
 
     desig_list = [
         "প্রোগ্রামার", "মেইনটেন্যান্স ইঞ্জিনিয়ার", 
@@ -236,9 +238,48 @@ def main():
             final_uni = smart_geo_input('উৎস ইউনিয়ন (Union)', uni_opts, f'geo_uni_{i}')
 
         s1, s2, s3 = st.columns(3)
-        with s1: s_name = st.text_input("উৎস নাম (Source Name) *", key=f"s_name_{i}")
+        with s1: s_name = st.text_input("উৎস (Source Name) *", key=f"s_name_{i}")
         with s2: s_core = st.selectbox("উৎস কোর টাইপ *", core_type_opts, key=f"s_core_{i}")
         with s3: s_dist = st.number_input("উৎস দূরত্ব / Distance (KM) *", min_value=0.0, step=0.1, key=f"s_dist_{i}")
+
+        # --- Intermediate Points ---
+        points_for_this_fiber = []
+        num_points = st.session_state.point_rows.get(i, 0)
+
+        if num_points > 0:
+            st.markdown('<div class="section-head" style="margin-top: 15px; margin-bottom: 10px;">পয়েন্টের তথ্য</div>', unsafe_allow_html=True)
+
+        for j in range(num_points):
+            st.markdown(f"<h6>&nbsp;&nbsp;&nbsp;পয়েন্ট - {j+1}</h6>", unsafe_allow_html=True)
+            p_c1, p_c2, p_c3 = st.columns(3)
+            with p_c1:
+                p_name = st.text_input("পয়েন্টের নাম (Point Name)", key=f"p_name_{i}_{j}")
+            with p_c2:
+                p_core = st.selectbox("কোর টাইপ", core_type_opts, key=f"p_core_{i}_{j}")
+            with p_c3:
+                p_dist = st.number_input("দূরত্ব / Distance (KM)", min_value=0.0, step=0.1, key=f"p_dist_{i}_{j}")
+            
+            points_for_this_fiber.append({
+                "name": p_name,
+                "core": p_core,
+                "dist": p_dist
+            })
+
+        # Add/Remove Point Buttons for this specific fiber line
+        p_btn1, p_btn2, p_btn_spacer = st.columns([2, 1, 3])
+        with p_btn1:
+            if st.button("➕ পয়েন্টের তথ্য যোগ করুন", key=f"add_point_{i}", use_container_width=True):
+                st.session_state.point_rows[i] = st.session_state.point_rows.get(i, 0) + 1
+                st.rerun()
+        with p_btn2:
+            if st.button("➖ বাদ দিন", key=f"rem_point_{i}", use_container_width=True) and st.session_state.point_rows.get(i, 0) > 0:
+                current_points = st.session_state.point_rows.get(i, 0)
+                st.session_state.point_rows[i] = current_points - 1
+                # Clean up state for the removed widget to prevent issues
+                for prefix in ["p_name_", "p_core_", "p_dist_"]:
+                    key_to_del = f"{prefix}{i}_{current_points - 1}"
+                    if key_to_del in st.session_state: del st.session_state[key_to_del]
+                st.rerun()
 
         st.markdown('<div class="section-head">গন্তব্য এলাকার তথ্য</div>', unsafe_allow_html=True)
         gd1, gd2, gd3, gd4 = st.columns(4)
@@ -256,7 +297,7 @@ def main():
             d_final_uni = smart_geo_input('গন্তব্য ইউনিয়ন (Union)', d_uni_opts, f'd_geo_uni_{i}')
 
         d1, d2, d3 = st.columns(3)
-        with d1: d_name = st.text_input("গন্তব্য নাম (Destination Name) *", key=f"d_name_{i}")
+        with d1: d_name = st.text_input("গন্তব্য (Destination Name) *", key=f"d_name_{i}")
         with d2: d_core = st.selectbox("গন্তব্য কোর টাইপ *", core_type_opts, key=f"d_core_{i}")
         with d3: d_dist = st.number_input("গন্তব্য দূরত্ব / Distance (KM) *", min_value=0.0, step=0.1, key=f"d_dist_{i}")
         
@@ -269,7 +310,8 @@ def main():
             "d_div": d_final_div, "d_dist": d_final_dist, "d_upz": d_final_upz, "d_uni": d_final_uni,
             "dep_km": dep_km,
             "s_name": s_name, "s_core": s_core, "s_dist": s_dist,
-            "d_name": d_name, "d_core": d_core, "d_dist": d_dist
+            "d_name": d_name, "d_core": d_core, "d_dist": d_dist,
+            "points": points_for_this_fiber
         })
 
     # Add/Remove Line Buttons
@@ -287,11 +329,12 @@ def main():
     st.markdown("<br>", unsafe_allow_html=True)
     _, c_sub, _ = st.columns([4, 2, 4])
     with c_sub:
-        submit_btn = st.button("Submit", use_container_width=True, type="primary")
+        submit_btn = st.button("জমা দিন", use_container_width=True, type="primary")
 
     if submit_btn:
         officer_contact_valid = user_contact.isdigit() and len(user_contact) == 11 if user_contact else False
         
+        validation_errors = []
         missing_fields = []
         if not name: missing_fields.append("তথ্য প্রদানকারীর নাম (Name) *")
         if not user_contact: missing_fields.append("যোগাযোগ নম্বর *")
@@ -308,13 +351,28 @@ def main():
             if not rec["d_dist"]: missing_fields.append(f"গন্তব্য জেলা (District) (লাইন {idx+1})")
             if not rec["d_upz"]: missing_fields.append(f"গন্তব্য উপজেলা (Upazila) (লাইন {idx+1})")
             if not rec["d_uni"]: missing_fields.append(f"গন্তব্য ইউনিয়ন (Union) (লাইন {idx+1})")
-            if not rec["s_name"]: missing_fields.append(f"উৎস নাম (Source Name) * (লাইন {idx+1})")
+            if not rec["s_name"]: missing_fields.append(f"উৎস (Source Name) * (লাইন {idx+1})")
             if rec["s_core"] == "-- নির্বাচন করুন --": missing_fields.append(f"উৎস কোর টাইপ * (লাইন {idx+1})")
-            if not rec["d_name"]: missing_fields.append(f"গন্তব্য নাম (Destination Name) * (লাইন {idx+1})")
+            if not rec["d_name"]: missing_fields.append(f"গন্তব্য (Destination Name) * (লাইন {idx+1})")
             if rec["d_core"] == "-- নির্বাচন করুন --": missing_fields.append(f"গন্তব্য কোর টাইপ * (লাইন {idx+1})")
 
+            # Distance validation
+            s_dist = rec.get('s_dist', 0) or 0
+            d_dist = rec.get('d_dist', 0) or 0
+            dep_km = rec.get('dep_km', 0) or 0
+            total_points_dist = sum(p.get('dist', 0) or 0 for p in rec.get('points', []))
+            total_route_dist = s_dist + d_dist + total_points_dist
+            if total_route_dist > dep_km:
+                validation_errors.append(f"লাইন {idx+1}: মোট দূরত্ব (উৎস+গন্তব্য+পয়েন্ট) [{total_route_dist} KM] ডিপেন্ডেন্সি দূরত্বের [{dep_km} KM] চেয়ে বেশি হতে পারবে না।")
+
+        all_errors = []
         if missing_fields:
-            st.error("দয়া করে নিচের তথ্যগুলো পূরণ করুন:\n" + ", ".join(missing_fields))
+            all_errors.append("দয়া করে নিচের তথ্যগুলো পূরণ করুন:\n" + ", ".join(missing_fields))
+        if validation_errors:
+            all_errors.extend(validation_errors)
+
+        if all_errors:
+            st.error("\n\n".join(all_errors))
         elif not officer_contact_valid:
             st.error("❌ যোগাযোগ নম্বর সঠিক নয় (১১ ডিজিট ও শুধুমাত্র সংখ্যা হতে হবে)।")
         else:
@@ -341,7 +399,8 @@ def main():
                         "গন্তব্য (Destination)": rec["d_name"],
                         "গন্তব্য কোর টাইপ": rec["d_core"],
                         "গন্তব্য দূরত্ব (KM)": rec["d_dist"],
-                        "ডিপেন্ডেন্সি (KM)": rec["dep_km"]
+                        "ডিপেন্ডেন্সি (KM)": rec["dep_km"],
+                        "পয়েন্টসমূহ": json.dumps(rec["points"], ensure_ascii=False) if rec.get("points") else ""
                     })
                 
                 new_record = pd.DataFrame(records_to_save)
@@ -357,7 +416,8 @@ def main():
                     "বিভাগ", "জেলা", "উপজেলা", "ইউনিয়ন", 
                     "গন্তব্য বিভাগ", "গন্তব্য জেলা", "গন্তব্য উপজেলা", "গন্তব্য ইউনিয়ন",
                     "উৎস (Source)", "উৎস কোর টাইপ", "উৎস দূরত্ব (KM)", 
-                    "গন্তব্য (Destination)", "গন্তব্য কোর টাইপ", "গন্তব্য দূরত্ব (KM)", "ডিপেন্ডেন্সি (KM)"
+                    "গন্তব্য (Destination)", "গন্তব্য কোর টাইপ", "গন্তব্য দূরত্ব (KM)", "ডিপেন্ডেন্সি (KM)",
+                    "পয়েন্টসমূহ"
                 ]
                 
                 final_columns = [c for c in expected_order if c in updated_df.columns] + [c for c in updated_df.columns if c not in expected_order]
@@ -383,9 +443,10 @@ def main():
                 # Clear Session State for Fiber records
                 current_keys = list(st.session_state.keys())
                 for key in current_keys:
-                    if any(prefix in key for prefix in ["dep_", "s_name_", "s_core_", "s_dist_", "d_name_", "d_core_", "d_dist_", "geo_div_", "geo_dist_", "geo_upz_", "geo_uni_", "d_geo_div_", "d_geo_dist_", "d_geo_upz_", "d_geo_uni_"]):
+                    if any(prefix in key for prefix in ["dep_", "s_name_", "s_core_", "s_dist_", "d_name_", "d_core_", "d_dist_", "geo_div_", "geo_dist_", "geo_upz_", "geo_uni_", "d_geo_div_", "d_geo_dist_", "d_geo_upz_", "d_geo_uni_", "p_name_", "p_core_", "p_dist_"]):
                         del st.session_state[key]
                 st.session_state.fiber_rows = 1
+                st.session_state.point_rows = {}
 
                 st.rerun()
                 
