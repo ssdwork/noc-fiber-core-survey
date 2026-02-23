@@ -74,7 +74,7 @@ def smart_geo_input(label, options_list, key):
 # -----------------------------------------------------------------------------
 # 3. PAGE SETUP & DESIGN
 # -----------------------------------------------------------------------------
-st.set_page_config(page_title="ফাইবার কোর কানেকশন জরিপ", page_icon="🖱", layout="wide", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="ফাইবার কানেকশন জরিপ", page_icon="🖱", layout="wide", initial_sidebar_state="collapsed")
 
 st.markdown("""
     <style>
@@ -220,20 +220,20 @@ def main():
         st.markdown(f"#### ফাইবার লাইন - {i+1}")
         
         # --- GEOGRAPHY INFO ---
-        st.markdown('<div class="section-head">উৎস এলাকার তথ্য...</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-head">উৎস এলাকার তথ্য</div>', unsafe_allow_html=True)
         g1, g2, g3, g4 = st.columns(4)
         with g1:
             div_list = list(BD_DATA.keys())
-            final_div = smart_geo_input('বিভাগ (Division)', div_list, f'geo_div_{i}')
+            final_div = smart_geo_input('উৎস বিভাগ (Division)', div_list, f'geo_div_{i}')
         with g2:
             dist_opts = list(BD_DATA[final_div].keys()) if final_div in BD_DATA else []
-            final_dist = smart_geo_input('জেলা (District)', dist_opts, f'geo_dist_{i}')
+            final_dist = smart_geo_input('উৎস জেলা (District)', dist_opts, f'geo_dist_{i}')
         with g3:
             upz_opts = list(BD_DATA[final_div][final_dist].keys()) if (final_div in BD_DATA and final_dist in BD_DATA[final_div]) else []
-            final_upz = smart_geo_input('উপজেলা (Upazila)', upz_opts, f'geo_upz_{i}')
+            final_upz = smart_geo_input('উৎস উপজেলা (Upazila)', upz_opts, f'geo_upz_{i}')
         with g4:
             uni_opts = BD_DATA[final_div][final_dist][final_upz] if (final_div in BD_DATA and final_dist in BD_DATA[final_div] and final_upz in BD_DATA[final_div][final_dist]) else []
-            final_uni = smart_geo_input('ইউনিয়ন (Union)', uni_opts, f'geo_uni_{i}')
+            final_uni = smart_geo_input('উৎস ইউনিয়ন (Union)', uni_opts, f'geo_uni_{i}')
 
         s1, s2, s3 = st.columns(3)
         with s1: s_name = st.text_input("উৎস (Source Name) *", key=f"s_name_{i}")
@@ -300,10 +300,10 @@ def main():
 
         # Validate Fiber fields
         for idx, rec in enumerate(fiber_records):
-            if not rec["div"]: missing_fields.append(f"বিভাগ (Division) (লাইন {idx+1})")
-            if not rec["dist"]: missing_fields.append(f"জেলা (District) (লাইন {idx+1})")
-            if not rec["upz"]: missing_fields.append(f"উপজেলা (Upazila) (লাইন {idx+1})")
-            if not rec["uni"]: missing_fields.append(f"ইউনিয়ন (Union) (লাইন {idx+1})")
+            if not rec["div"]: missing_fields.append(f"উৎস বিভাগ (Division) (লাইন {idx+1})")
+            if not rec["dist"]: missing_fields.append(f"উৎস জেলা (District) (লাইন {idx+1})")
+            if not rec["upz"]: missing_fields.append(f"উৎস উপজেলা (Upazila) (লাইন {idx+1})")
+            if not rec["uni"]: missing_fields.append(f"উৎস ইউনিয়ন (Union) (লাইন {idx+1})")
             if not rec["d_div"]: missing_fields.append(f"গন্তব্য বিভাগ (Division) (লাইন {idx+1})")
             if not rec["d_dist"]: missing_fields.append(f"গন্তব্য জেলা (District) (লাইন {idx+1})")
             if not rec["d_upz"]: missing_fields.append(f"গন্তব্য উপজেলা (Upazila) (লাইন {idx+1})")
