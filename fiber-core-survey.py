@@ -253,11 +253,11 @@ def main():
             st.markdown(f"<h6>&nbsp;&nbsp;&nbsp;পয়েন্ট - {j+1}</h6>", unsafe_allow_html=True)
             p_c1, p_c2, p_c3 = st.columns(3)
             with p_c1:
-                p_name = st.text_input("পয়েন্টের নাম (Point Name)", key=f"p_name_{i}_{j}")
+                p_name = st.text_input(f"পয়েন্ট {j+1} এর নাম (Point {j+1} Name)", key=f"p_name_{i}_{j}")
             with p_c2:
-                p_core = st.selectbox("কোর টাইপ", core_type_opts, key=f"p_core_{i}_{j}")
+                p_core = st.selectbox("পয়েন্ট কোর টাইপ", core_type_opts, key=f"p_core_{i}_{j}")
             with p_c3:
-                p_dist = st.number_input("দূরত্ব / Distance (KM)", min_value=0.0, step=0.1, key=f"p_dist_{i}_{j}")
+                p_dist = st.number_input("পয়েন্ট দূরত্ব / Point  Distance (KM)", min_value=0.0, step=0.1, key=f"p_dist_{i}_{j}")
             
             points_for_this_fiber.append({
                 "name": p_name,
