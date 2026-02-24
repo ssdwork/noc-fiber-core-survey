@@ -182,6 +182,31 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 def main():
+    # -----------------------------------------------------------------------------
+    # AUTHENTICATION
+    # -----------------------------------------------------------------------------
+    if 'authenticated' not in st.session_state:
+        st.session_state.authenticated = False
+
+    if not st.session_state.authenticated:
+        st.markdown("<br><br>", unsafe_allow_html=True)
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            st.markdown("<h2 style='text-align: center; color: #006400;'>লগইন করুন</h2>", unsafe_allow_html=True)
+            password = st.text_input("পাসওয়ার্ড (Password)", type="password", key="auth_pass")
+            if st.button("প্রবেশ করুন (Login)", use_container_width=True):
+                if password == 'Bccuser2026':
+                    st.session_state.authenticated = True
+                    st.session_state.user_role = 'USER'
+                    st.rerun()
+                elif password == 'Bccadmin2026':
+                    st.session_state.authenticated = True
+                    st.session_state.user_role = 'ADMIN'
+                    st.rerun()
+                else:
+                    st.error("❌ ভুল পাসওয়ার্ড! আবার চেষ্টা করুন।")
+        return
+
     conn = st.connection("gsheets", type=GSheetsConnection)
 
     st.markdown("""
@@ -442,7 +467,10 @@ def main():
                 time.sleep(3)
                 placeholder.empty()
                 
-                st.session_state.clear()
+                # Clear all state except authentication
+                for key in list(st.session_state.keys()):
+                    if key not in ['authenticated', 'user_role']:
+                        del st.session_state[key]
 
                 st.markdown("<meta http-equiv='refresh' content='0'>", unsafe_allow_html=True)
 
