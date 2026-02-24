@@ -319,7 +319,7 @@ def main():
 
         fiber_records.append({
             "div": final_div, "dist": final_dist, "upz": final_upz, "uni": final_uni,
-            "d_div": d_final_div, "d_dist": d_final_dist, "d_upz": d_final_upz, "d_uni": d_final_uni,
+            "d_div": d_final_div, "d_district": d_final_dist, "d_upz": d_final_upz, "d_uni": d_final_uni,
             "dep_km": dep_km,
             "s_name": s_name, "s_core": s_core, "s_dist": s_dist,
             "d_name": d_name, "d_core": d_core, "d_dist": d_dist,
@@ -360,7 +360,7 @@ def main():
             if not rec["upz"]: missing_fields.append(f"উৎস উপজেলা (Upazila) (লাইন {idx+1})")
             if not rec["uni"]: missing_fields.append(f"উৎস ইউনিয়ন (Union) (লাইন {idx+1})")
             if not rec["d_div"]: missing_fields.append(f"গন্তব্য বিভাগ (Division) (লাইন {idx+1})")
-            if not rec["d_dist"]: missing_fields.append(f"গন্তব্য জেলা (District) (লাইন {idx+1})")
+            if not rec["d_district"]: missing_fields.append(f"গন্তব্য জেলা (District) (লাইন {idx+1})")
             if not rec["d_upz"]: missing_fields.append(f"গন্তব্য উপজেলা (Upazila) (লাইন {idx+1})")
             if not rec["d_uni"]: missing_fields.append(f"গন্তব্য ইউনিয়ন (Union) (লাইন {idx+1})")
             if not rec["s_name"]: missing_fields.append(f"উৎস (Source Name) * (লাইন {idx+1})")
@@ -396,7 +396,7 @@ def main():
                         "উৎস কোর টাইপ": rec["s_core"],
                         "উৎস দূরত্ব (KM)": rec["s_dist"],
                         "গন্তব্য বিভাগ": rec["d_div"],
-                        "গন্তব্য জেলা": rec["d_dist"],
+                        "গন্তব্য জেলা": rec["d_district"],
                         "গন্তব্য উপজেলা": rec["d_upz"],
                         "গন্তব্য ইউনিয়ন": rec["d_uni"],
                         "গন্তব্য (Destination Name)": rec["d_name"],
@@ -421,12 +421,12 @@ def main():
 
                 conn.update(data=updated_df)
                 
-                st.balloons()
+                st.snow()
                 
                 success_message = """
                     <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); z-index: 999999; display: flex; align-items: center; justify-content: center;">
                         <div style="background-color: #FFFFFF; padding: 40px; border-radius: 20px; border: 3px solid #006400; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.3); max-width: 500px; width: 90%;">
-                            <h1 style="color: #006400; font-family: 'Calibri', 'Nikosh', sans-serif; font-size: 40px; margin: 0; font-weight: 700;">✅ সফলভাবে সংরক্ষিত হয়েছে!</h1>
+                            <h1 style="color: #006400; font-family: 'Calibri', 'Nikosh', sans-serif; font-size: 40px; margin: 0; font-weight: 700;">✅ সফলভাবে সংরক্ষিত হয়েছে! 🎆</h1>
                             <p style="color: #000000; font-size: 20px; margin-top: 15px; font-weight: 500;">আপনার তথ্য ডাটাবেজে জমা হয়েছে।</p>
                         </div>
                     </div>
