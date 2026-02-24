@@ -379,6 +379,7 @@ def main():
         elif not officer_contact_valid:
             st.error("❌ যোগাযোগ নম্বর সঠিক নয় (১১ ডিজিট ও শুধুমাত্র সংখ্যা হতে হবে)।")
         else:
+            submission_success = False
             try:
                 records_to_save = []
                 for rec in fiber_records:
@@ -420,7 +421,12 @@ def main():
                 updated_df = updated_df[final_columns]
 
                 conn.update(data=updated_df)
-                
+                submission_success = True
+
+            except Exception as e:
+                st.error(f"Error during submission: {e}")
+
+            if submission_success:
                 st.snow()
                 
                 success_message = """
@@ -439,9 +445,6 @@ def main():
                 st.session_state.clear()
 
                 st.rerun()
-                
-            except Exception as e:
-                st.error(f"Error during submission: {e}")
 
     st.markdown("---")
     #st.markdown("""
