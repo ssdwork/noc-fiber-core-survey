@@ -91,13 +91,7 @@ st.markdown("""
         font-size: 16px !important;
         padding-bottom: 5px;
     }
-    .fiber-block {
-        background: #f1f8e9;
-        padding: 15px;
-        border-radius: 8px;
-        border: 1px solid #c5e1a5;
-        margin-bottom: 15px;
-    }
+   
     
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
@@ -614,3 +608,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
