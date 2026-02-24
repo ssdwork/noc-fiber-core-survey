@@ -436,13 +436,7 @@ def main():
                 time.sleep(3)
                 placeholder.empty()
                 
-                # Clear Session State for Fiber records
-                current_keys = list(st.session_state.keys())
-                for key in current_keys:
-                    if any(prefix in key for prefix in ["dep_", "s_name_", "s_core_", "s_dist_", "d_name_", "d_core_", "d_dist_", "geo_div_", "geo_dist_", "geo_upz_", "geo_uni_", "d_geo_div_", "d_geo_dist_", "d_geo_upz_", "d_geo_uni_", "p_name_", "p_core_", "p_dist_"]):
-                        del st.session_state[key]
-                st.session_state.fiber_rows = 1
-                st.session_state.point_rows = {}
+                st.session_state.clear()
 
                 st.rerun()
                 
