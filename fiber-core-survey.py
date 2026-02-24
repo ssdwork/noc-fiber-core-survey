@@ -62,6 +62,18 @@ def build_bd_data():
 BD_DATA = build_bd_data()
 
 # -----------------------------------------------------------------------------
+# DATABASE SCHEMA
+# -----------------------------------------------------------------------------
+DB_COLUMNS = [
+    "Timestamp", "নাম", "যোগাযোগ নম্বর", "পদবী", "কর্মস্থল", 
+    "উৎস বিভাগ", "উৎস জেলা", "উৎস উপজেলা", "উৎস ইউনিয়ন", 
+    "উৎস (Source Name)", "উৎস কোর টাইপ", "উৎস দূরত্ব (KM)", 
+    "গন্তব্য বিভাগ", "গন্তব্য জেলা", "গন্তব্য উপজেলা", "গন্তব্য ইউনিয়ন",
+    "গন্তব্য (Destination Name)", "গন্তব্য কোর টাইপ", "গন্তব্য দূরত্ব (KM)", 
+    "ডিপেন্ডেন্সি (KM)", "পয়েন্টসমূহ"
+]
+
+# -----------------------------------------------------------------------------
 # 2. UI HELPERS
 # -----------------------------------------------------------------------------
 def smart_geo_input(label, options_list, key):
@@ -385,18 +397,18 @@ def main():
                         "যোগাযোগ নম্বর": user_contact,
                         "পদবী": designation,
                         "কর্মস্থল": workplace,
-                        "বিভাগ": rec["div"],
-                        "জেলা": rec["dist"],
-                        "উপজেলা": rec["upz"],
-                        "ইউনিয়ন": rec["uni"],
+                        "উৎস বিভাগ": rec["div"],
+                        "উৎস জেলা": rec["dist"],
+                        "উৎস উপজেলা": rec["upz"],
+                        "উৎস ইউনিয়ন": rec["uni"],
+                        "উৎস (Source Name)": rec["s_name"],
+                        "উৎস কোর টাইপ": rec["s_core"],
+                        "উৎস দূরত্ব (KM)": rec["s_dist"],
                         "গন্তব্য বিভাগ": rec["d_div"],
                         "গন্তব্য জেলা": rec["d_dist"],
                         "গন্তব্য উপজেলা": rec["d_upz"],
                         "গন্তব্য ইউনিয়ন": rec["d_uni"],
-                        "উৎস (Source)": rec["s_name"],
-                        "উৎস কোর টাইপ": rec["s_core"],
-                        "উৎস দূরত্ব (KM)": rec["s_dist"],
-                        "গন্তব্য (Destination)": rec["d_name"],
+                        "গন্তব্য (Destination Name)": rec["d_name"],
                         "গন্তব্য কোর টাইপ": rec["d_core"],
                         "গন্তব্য দূরত্ব (KM)": rec["d_dist"],
                         "ডিপেন্ডেন্সি (KM)": rec["dep_km"],
@@ -411,14 +423,7 @@ def main():
                 else:
                     updated_df = new_record
                 
-                expected_order = [
-                    "Timestamp", "নাম", "যোগাযোগ নম্বর", "পদবী", "কর্মস্থল", 
-                    "বিভাগ", "জেলা", "উপজেলা", "ইউনিয়ন", 
-                    "গন্তব্য বিভাগ", "গন্তব্য জেলা", "গন্তব্য উপজেলা", "গন্তব্য ইউনিয়ন",
-                    "উৎস (Source)", "উৎস কোর টাইপ", "উৎস দূরত্ব (KM)", 
-                    "গন্তব্য (Destination)", "গন্তব্য কোর টাইপ", "গন্তব্য দূরত্ব (KM)", "ডিপেন্ডেন্সি (KM)",
-                    "পয়েন্টসমূহ"
-                ]
+                expected_order = DB_COLUMNS
                 
                 final_columns = [c for c in expected_order if c in updated_df.columns] + [c for c in updated_df.columns if c not in expected_order]
                 updated_df = updated_df[final_columns]
