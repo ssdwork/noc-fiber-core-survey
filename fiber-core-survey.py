@@ -496,8 +496,39 @@ def render_dashboard(conn):
                               title="কোর টাইপ অনুপাত (Source Core Type)",
                               hole=0.4, color_discrete_sequence=px.colors.sequential.Greens_r)
             st.plotly_chart(fig_core, use_container_width=True)
-            
-    # 5. Data Table Preview
+
+    st.markdown("---")
+
+    # Additional Graphs
+    c3, c4 = st.columns(2)
+
+    with c3:
+        # Chart: Entries over Time
+        if "Timestamp" in df.columns:
+            df['Timestamp'] = pd.to_datetime(df['Timestamp'], errors='coerce')
+            df_time = df.dropna(subset=['Timestamp'])
+            if not df_time.empty:
+                daily_entries = df_time.set_index('Timestamp').resample('D').size().reset_index(name='Count')
+                daily_entries.columns = ["Date", "Count"]
+                fig_time = px.line(daily_entries, x='Date', y='Count', 
+                                   title="দৈনিক এন্ট্রি (Entries per Day)",
+                                   markers=True)
+                fig_time.update_layout(xaxis_title="তারিখ", yaxis_title="এন্ট্রির সংখ্যা")
+                st.plotly_chart(fig_time, use_container_width=True)
+
+    with c4:
+        # Chart: Top 10 Users by Submissions
+        if "নাম" in df.columns:
+            user_counts = df["নাম"].value_counts().nlargest(10).reset_index()
+            user_counts.columns = ["User", "Count"]
+            fig_user = px.bar(user_counts.sort_values('Count', ascending=True), 
+                              x="Count", y="User", orientation='h',
+                              title="সর্বাধিক তথ্য প্রদানকারী (Top 10 Users)",
+                              color="Count", color_continuous_scale="Blues")
+            fig_user.update_layout(xaxis_title="এন্ট্রির সংখ্যা", yaxis_title="ব্যবহারকারী")
+            st.plotly_chart(fig_user, use_container_width=True)
+
+    # Data Table Preview
     st.markdown("### সাম্প্রতিক এন্ট্রি সমূহ")
     st.dataframe(df.tail(10))
 
