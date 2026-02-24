@@ -70,7 +70,7 @@ DB_COLUMNS = [
     "উৎস (Source Name)", "উৎস কোর টাইপ", "উৎস দূরত্ব (KM)", 
     "গন্তব্য বিভাগ", "গন্তব্য জেলা", "গন্তব্য উপজেলা", "গন্তব্য ইউনিয়ন",
     "গন্তব্য (Destination Name)", "গন্তব্য কোর টাইপ", "গন্তব্য দূরত্ব (KM)", 
-    "ডিপেন্ডেন্সি (KM)", "পয়েন্টসমূহ"
+    "ডিপেন্ডেন্সি (KM)", "পয়েন্টসমূহ"
 ]
 
 # -----------------------------------------------------------------------------
@@ -181,48 +181,11 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-def main():
-    # -----------------------------------------------------------------------------
-    # AUTHENTICATION
-    # -----------------------------------------------------------------------------
-    if 'authenticated' not in st.session_state:
-        st.session_state.authenticated = False
 
-    if not st.session_state.authenticated:
-        st.markdown("<br><br>", unsafe_allow_html=True)
-        col1, col2, col3 = st.columns([1, 2, 1])
-        with col2:
-            st.markdown("<h2 style='text-align: center; color: #006400;'>লগইন করুন</h2>", unsafe_allow_html=True)
-            password = st.text_input("পাসওয়ার্ড (Password)", type="password", key="auth_pass")
-            if st.button("প্রবেশ করুন (Login)", use_container_width=True):
-                if password == 'Bccuser2026':
-                    st.session_state.authenticated = True
-                    st.session_state.user_role = 'USER'
-                    st.rerun()
-                elif password == 'Bccadmin2026':
-                    st.session_state.authenticated = True
-                    st.session_state.user_role = 'ADMIN'
-                    st.rerun()
-                else:
-                    st.error("❌ ভুল পাসওয়ার্ড! আবার চেষ্টা করুন।")
-        return
-
-    conn = st.connection("gsheets", type=GSheetsConnection)
-
-    st.markdown("""
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
-            <div style="flex: 0 0 100px; text-align: left;">
-                <img src="https://raw.githubusercontent.com/ssdwork/bd-broadband-survey/main/Ict Division Logo Vector.svg" style="height: 70px; width: auto;" title="ICT Division">
-            </div>
-            <div style="flex: 1; text-align: center;">
-                <div class="main-title"> ফাইবার কানেকশন জরিপ</div>
-            </div>
-            <div style="flex: 0 0 100px; text-align: right;">
-                <img src="https://raw.githubusercontent.com/ssdwork/bd-broadband-survey/main/Bangladesh_Computer_Council_Logo.svg" style="height: 45px; width: auto;" title="Bangladesh Computer Council">
-            </div>
-        </div>
-    """, unsafe_allow_html=True)
-
+# -----------------------------------------------------------------------------
+# 4. FUNCTION: RENDER SURVEY FORM (User & Admin both can use)
+# -----------------------------------------------------------------------------
+def render_survey_form(conn):
     if 'fiber_rows' not in st.session_state:
         st.session_state.fiber_rows = 1
     if 'point_rows' not in st.session_state:
@@ -254,6 +217,7 @@ def main():
     st.markdown('<div class="section-head">ফাইবার কোর কানেকশনের তথ্য</div>', unsafe_allow_html=True)
     core_type_opts = ["-- নির্বাচন করুন --", "48", "24", "12"]
     fiber_records = []
+    
     for i in range(st.session_state.fiber_rows):
         st.markdown(f'<div class="fiber-block">', unsafe_allow_html=True)
         st.markdown(f"#### ফাইবার লাইন - {i+1}")
@@ -284,17 +248,17 @@ def main():
         num_points = st.session_state.point_rows.get(i, 0)
 
         if num_points > 0:
-            st.markdown('<div class="section-head" style="margin-top: 15px; margin-bottom: 10px;">পয়েন্টের তথ্য</div>', unsafe_allow_html=True)
+            st.markdown('<div class="section-head" style="margin-top: 15px; margin-bottom: 10px;">পয়েন্টের তথ্য</div>', unsafe_allow_html=True)
 
         for j in range(num_points):
-            st.markdown(f"<h6>&nbsp;&nbsp;&nbsp;পয়েন্ট - {j+1}</h6>", unsafe_allow_html=True)
+            st.markdown(f"<h6>&nbsp;&nbsp;&nbsp;পয়েন্ট - {j+1}</h6>", unsafe_allow_html=True)
             p_c1, p_c2, p_c3 = st.columns(3)
             with p_c1:
-                p_name = st.text_input(f"পয়েন্ট {j+1} এর নাম (Point {j+1} Name)", key=f"p_name_{i}_{j}")
+                p_name = st.text_input(f"পয়েন্ট {j+1} এর নাম (Point {j+1} Name)", key=f"p_name_{i}_{j}")
             with p_c2:
-                p_core = st.selectbox("পয়েন্ট কোর টাইপ", core_type_opts, key=f"p_core_{i}_{j}")
+                p_core = st.selectbox("পয়েন্ট কোর টাইপ", core_type_opts, key=f"p_core_{i}_{j}")
             with p_c3:
-                p_dist = st.number_input("পয়েন্ট দূরত্ব / Point  Distance (KM)", min_value=0.0, step=0.1, key=f"p_dist_{i}_{j}")
+                p_dist = st.number_input("পয়েন্ট দূরত্ব / Point  Distance (KM)", min_value=0.0, step=0.1, key=f"p_dist_{i}_{j}")
             
             points_for_this_fiber.append({
                 "name": p_name,
@@ -302,17 +266,17 @@ def main():
                 "dist": p_dist
             })
 
-        # Add/Remove Point Buttons for this specific fiber line
+        # Add/Remove Point Buttons
         p_btn1, p_btn2, p_btn_spacer = st.columns([2, 1, 3])
         with p_btn1:
-            if st.button("➕ পয়েন্টের তথ্য যোগ করুন", key=f"add_point_{i}", use_container_width=True):
+            if st.button("➕ পয়েন্টের তথ্য যোগ করুন", key=f"add_point_{i}", use_container_width=True):
                 st.session_state.point_rows[i] = st.session_state.point_rows.get(i, 0) + 1
                 st.rerun()
         with p_btn2:
             if st.button("➖ বাদ দিন", key=f"rem_point_{i}", use_container_width=True) and st.session_state.point_rows.get(i, 0) > 0:
                 current_points = st.session_state.point_rows.get(i, 0)
                 st.session_state.point_rows[i] = current_points - 1
-                # Clean up state for the removed widget to prevent issues
+                # Clean up state
                 for prefix in ["p_name_", "p_core_", "p_dist_"]:
                     key_to_del = f"{prefix}{i}_{current_points - 1}"
                     if key_to_del in st.session_state: del st.session_state[key_to_del]
@@ -429,7 +393,7 @@ def main():
                         "গন্তব্য কোর টাইপ": rec["d_core"],
                         "গন্তব্য দূরত্ব (KM)": rec["d_dist"],
                         "ডিপেন্ডেন্সি (KM)": rec["dep_km"],
-                        "পয়েন্টসমূহ": json.dumps(rec["points"], ensure_ascii=False) if rec.get("points") else ""
+                        "পয়েন্টসমূহ": json.dumps(rec["points"], ensure_ascii=False) if rec.get("points") else ""
                     })
                 
                 new_record = pd.DataFrame(records_to_save)
@@ -453,7 +417,6 @@ def main():
 
             if submission_success:
                 st.snow()
-                
                 success_message = """
                     <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); z-index: 999999; display: flex; align-items: center; justify-content: center;">
                         <div style="background-color: #FFFFFF; padding: 40px; border-radius: 20px; border: 3px solid #006400; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.3); max-width: 500px; width: 90%;">
@@ -474,15 +437,150 @@ def main():
 
                 st.markdown("<meta http-equiv='refresh' content='0'>", unsafe_allow_html=True)
 
+# -----------------------------------------------------------------------------
+# 5. FUNCTION: RENDER ADMIN DASHBOARD
+# -----------------------------------------------------------------------------
+def render_dashboard(conn):
+    st.markdown("## 📊 এডমিন ড্যাশবোর্ড (Admin Statistics)")
+    
+    # 1. Fetch Data
+    with st.spinner("ডাটা লোড হচ্ছে..."):
+        df = conn.read(ttl=0) 
+    
+    if df is None or df.empty:
+        st.warning("⚠️ ডাটাবেজে কোন তথ্য পাওয়া যায়নি।")
+        return
+
+    # 2. Data Cleaning for Stats
+    # Convert numeric columns safely
+    numeric_cols = ["উৎস দূরত্ব (KM)", "গন্তব্য দূরত্ব (KM)", "ডিপেন্ডেন্সি (KM)"]
+    for col in numeric_cols:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
+    
+    # 3. KPIs
+    total_entries = len(df)
+    total_source_dist = df["উৎস দূরত্ব (KM)"].sum()
+    total_dest_dist = df["গন্তব্য দূরত্ব (KM)"].sum()
+    total_dependency = df["ডিপেন্ডেন্সি (KM)"].sum()
+    total_km = total_source_dist + total_dest_dist
+    unique_users = df["নাম"].nunique() if "নাম" in df.columns else 0
+
+    # KPI Cards
+    k1, k2, k3, k4 = st.columns(4)
+    k1.metric("মোট এন্ট্রি", total_entries)
+    k2.metric("মোট দূরত্ব (Source+Dest)", f"{total_km:.2f} KM")
+    k3.metric("মোট ডিপেন্ডেন্সি", f"{total_dependency:.2f} KM")
+    k4.metric("তথ্য প্রদানকারী", unique_users)
+
     st.markdown("---")
-    #st.markdown("""
-     #   <div style="display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 20px;">
-      #      <div style="color: #006400; font-size: 14px; font-weight: 700;">যোগাযোগের নম্বর:</div>
-       #     <div style="color: #000000;">+8801677891434</div>
-        #    <div style="color: #000000;">+8801712511005</div>
-         #   <div style="color: #000000;">+880255006823</div>
-        #</div>
-    #""", unsafe_allow_html=True)
+
+    # 4. Graphs
+    c1, c2 = st.columns(2)
+    
+    with c1:
+        # Chart: Entries by Division (Source)
+        if "উৎস বিভাগ" in df.columns:
+            div_counts = df["উৎস বিভাগ"].value_counts().reset_index()
+            div_counts.columns = ["Division", "Count"]
+            fig_div = px.bar(div_counts, x="Division", y="Count", 
+                             title="বিভাগ অনুযায়ী এন্ট্রি (Source Division)",
+                             color="Count", color_continuous_scale="Greens")
+            st.plotly_chart(fig_div, use_container_width=True)
+
+    with c2:
+        # Chart: Core Type Distribution
+        if "উৎস কোর টাইপ" in df.columns:
+            core_counts = df["উৎস কোর টাইপ"].value_counts().reset_index()
+            core_counts.columns = ["Core Type", "Count"]
+            fig_core = px.pie(core_counts, values="Count", names="Core Type", 
+                              title="কোর টাইপ অনুপাত (Source Core Type)",
+                              hole=0.4, color_discrete_sequence=px.colors.sequential.Greens_r)
+            st.plotly_chart(fig_core, use_container_width=True)
+            
+    # 5. Data Table Preview
+    st.markdown("### সাম্প্রতিক এন্ট্রি সমূহ")
+    st.dataframe(df.tail(10))
+
+    if st.button("Refresh Data"):
+        st.rerun()
+
+# -----------------------------------------------------------------------------
+# 6. MAIN FUNCTION (UPDATED)
+# -----------------------------------------------------------------------------
+def main():
+    # Authentication Check
+    if 'authenticated' not in st.session_state:
+        st.session_state.authenticated = False
+
+    if not st.session_state.authenticated:
+        st.markdown("<br><br>", unsafe_allow_html=True)
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            st.markdown("<h2 style='text-align: center; color: #006400;'>লগইন করুন</h2>", unsafe_allow_html=True)
+            password = st.text_input("পাসওয়ার্ড (Password)", type="password", key="auth_pass")
+            if st.button("প্রবেশ করুন (Login)", use_container_width=True):
+                if password == 'Bccuser2026':
+                    st.session_state.authenticated = True
+                    st.session_state.user_role = 'USER'
+                    st.rerun()
+                elif password == 'Bccadmin2026':
+                    st.session_state.authenticated = True
+                    st.session_state.user_role = 'ADMIN'
+                    st.rerun()
+                else:
+                    st.error("❌ ভুল পাসওয়ার্ড! আবার চেষ্টা করুন।")
+        return
+
+    # Connect to Google Sheets
+    conn = st.connection("gsheets", type=GSheetsConnection)
+
+    # Header Image & Title
+    st.markdown("""
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+            <div style="flex: 0 0 100px; text-align: left;">
+                <img src="https://raw.githubusercontent.com/ssdwork/bd-broadband-survey/main/Ict Division Logo Vector.svg" style="height: 70px; width: auto;" title="ICT Division">
+            </div>
+            <div style="flex: 1; text-align: center;">
+                <div class="main-title"> ফাইবার কানেকশন জরিপ</div>
+            </div>
+            <div style="flex: 0 0 100px; text-align: right;">
+                <img src="https://raw.githubusercontent.com/ssdwork/bd-broadband-survey/main/Bangladesh_Computer_Council_Logo.svg" style="height: 45px; width: auto;" title="Bangladesh Computer Council">
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
+
+    # --- NAVIGATION LOGIC ---
+    
+    if st.session_state.user_role == 'ADMIN':
+        # Sidebar for Admin
+        with st.sidebar:
+            st.markdown("### 🔐 Admin Panel")
+            nav_option = st.radio("নেভিগেশন (Navigation)", ["Dashboard", "Survey Form"])
+            
+            st.markdown("---")
+            if st.button("Log Out"):
+                st.session_state.authenticated = False
+                st.session_state.user_role = None
+                st.rerun()
+
+        if nav_option == "Dashboard":
+            render_dashboard(conn)
+        else:
+            render_survey_form(conn)
+            
+    else:
+        # User Logic (No Sidebar, just Form)
+        with st.sidebar:
+             if st.button("Log Out"):
+                st.session_state.authenticated = False
+                st.session_state.user_role = None
+                st.rerun()
+        
+        render_survey_form(conn)
+
+    # Footer
+    st.markdown("---")
 
 if __name__ == "__main__":
     main()
