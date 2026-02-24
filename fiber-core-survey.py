@@ -91,7 +91,7 @@ st.markdown("""
         font-size: 16px !important;
         padding-bottom: 5px;
     }
-   
+    
     
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
@@ -162,7 +162,7 @@ DB_COLUMNS = [
     "উৎস (Source Name)", "উৎস কোর টাইপ", "উৎস দূরত্ব (KM)", 
     "গন্তব্য বিভাগ", "গন্তব্য জেলা", "গন্তব্য উপজেলা", "গন্তব্য ইউনিয়ন",
     "গন্তব্য (Destination Name)", "গন্তব্য কোর টাইপ", "গন্তব্য দূরত্ব (KM)", 
-    "ডিপেন্ডেন্সি (KM)", "পয়েন্টসমূহ"
+    "ডিপেন্ডেন্সি (KM)", "পয়েন্টসমূহ"
 ]
 
 # -----------------------------------------------------------------------------
@@ -386,7 +386,7 @@ def render_survey_form(conn):
                         "গন্তব্য কোর টাইপ": rec["d_core"],
                         "গন্তব্য দূরত্ব (KM)": rec["d_dist"],
                         "ডিপেন্ডেন্সি (KM)": rec["dep_km"],
-                        "পয়েন্টসমূহ": json.dumps(rec["points"], ensure_ascii=False) if rec.get("points") else ""
+                        "পয়েন্টসমূহ": json.dumps(rec["points"], ensure_ascii=False) if rec.get("points") else ""
                     })
                 
                 new_record = pd.DataFrame(records_to_save)
@@ -608,4 +608,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
