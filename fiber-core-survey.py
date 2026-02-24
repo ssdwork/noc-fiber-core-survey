@@ -444,7 +444,7 @@ def main():
                 
                 st.session_state.clear()
 
-                st.rerun()
+                st.markdown("<meta http-equiv='refresh' content='0'>", unsafe_allow_html=True)
 
     st.markdown("---")
     #st.markdown("""
