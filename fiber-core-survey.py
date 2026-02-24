@@ -368,15 +368,6 @@ def main():
             if not rec["d_name"]: missing_fields.append(f"গন্তব্য (Destination Name) * (লাইন {idx+1})")
             if rec["d_core"] == "-- নির্বাচন করুন --": missing_fields.append(f"গন্তব্য কোর টাইপ * (লাইন {idx+1})")
 
-            # Distance validation
-            s_dist = rec.get('s_dist', 0) or 0
-            d_dist = rec.get('d_dist', 0) or 0
-            dep_km = rec.get('dep_km', 0) or 0
-            total_points_dist = sum(p.get('dist', 0) or 0 for p in rec.get('points', []))
-            total_route_dist = s_dist + d_dist + total_points_dist
-            if total_route_dist > dep_km:
-                validation_errors.append(f"লাইন {idx+1}: মোট দূরত্ব (উৎস+গন্তব্য+পয়েন্ট) [{total_route_dist} KM] ডিপেন্ডেন্সি দূরত্বের [{dep_km} KM] চেয়ে বেশি হতে পারবে না।")
-
         all_errors = []
         if missing_fields:
             all_errors.append("দয়া করে নিচের তথ্যগুলো পূরণ করুন:\n" + ", ".join(missing_fields))
