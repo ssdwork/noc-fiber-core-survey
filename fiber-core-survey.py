@@ -391,7 +391,7 @@ def render_survey_form(conn):
                 
                 new_record = pd.DataFrame(records_to_save)
                 
-                existing_data = conn.read(ttl=0)
+                existing_data = conn.read(worksheet="Main List", ttl=0)
                 if existing_data is not None and not existing_data.empty:
                     updated_df = pd.concat([existing_data, new_record], ignore_index=True)
                 else:
@@ -402,7 +402,7 @@ def render_survey_form(conn):
                 final_columns = [c for c in expected_order if c in updated_df.columns] + [c for c in updated_df.columns if c not in expected_order]
                 updated_df = updated_df[final_columns]
 
-                conn.update(data=updated_df)
+                conn.update(worksheet="Main List", data=updated_df)
                 submission_success = True
 
             except Exception as e:
@@ -438,7 +438,7 @@ def render_dashboard(conn):
     
     # 1. Fetch Data
     with st.spinner("ডাটা লোড হচ্ছে..."):
-        df = conn.read(ttl=0) 
+        df = conn.read(worksheet="Main List", ttl=0) 
     
     if df is None or df.empty:
         st.warning("⚠️ ডাটাবেজে কোন তথ্য পাওয়া যায়নি।")
