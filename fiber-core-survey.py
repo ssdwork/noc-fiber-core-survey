@@ -8,83 +8,7 @@ from streamlit_gsheets import GSheetsConnection
 import time
 
 # -----------------------------------------------------------------------------
-# 1. GEOGRAPHICAL DATA LOADER
-# -----------------------------------------------------------------------------
-NUHIL_RAW = {
-    "divisions": "https://raw.githubusercontent.com/nuhil/bangladesh-geocode/master/divisions/divisions.json",
-    "districts": "https://raw.githubusercontent.com/nuhil/bangladesh-geocode/master/districts/districts.json",
-    "upazilas": "https://raw.githubusercontent.com/nuhil/bangladesh-geocode/master/upazilas/upazilas.json",
-    "unions": "https://raw.githubusercontent.com/nuhil/bangladesh-geocode/master/unions/unions.json",
-}
-
-def fetch_json(url):
-    with urllib.request.urlopen(url, timeout=30) as r:
-        return json.loads(r.read().decode('utf-8'))
-
-@st.cache_data
-def build_bd_data():
-    try:
-        div_raw = fetch_json(NUHIL_RAW['divisions'])
-        dist_raw = fetch_json(NUHIL_RAW['districts'])
-        upz_raw = fetch_json(NUHIL_RAW['upazilas'])
-        uni_raw = fetch_json(NUHIL_RAW['unions'])
-        
-        def extract_data(raw):
-            if isinstance(raw, list):
-                for item in raw:
-                    if isinstance(item, dict) and 'data' in item: return item['data']
-            if isinstance(raw, dict) and 'data' in raw: return raw['data']
-            return []
-
-        divs, dists, upzs, unis = extract_data(div_raw), extract_data(dist_raw), extract_data(upz_raw), extract_data(uni_raw)
-        div_map = {str(d['id']): d.get('bn_name') or d.get('name') for d in divs}
-        dist_map = {str(d['id']): {'bn_name': d.get('bn_name') or d.get('name'), 'division_id': str(d.get('division_id'))} for d in dists}
-        upz_map = {str(u['id']): {'bn_name': u.get('bn_name') or u.get('name'), 'district_id': str(u.get('district_id'))} for u in upzs}
-        
-        uni_map = {}
-        for u in unis:
-            upid = str(u.get('upazilla_id') or u.get('upazila_id') or '')
-            uni_map.setdefault(upid, []).append(u.get('bn_name') or u.get('name'))
-
-        data_tree = {}
-        for upz_id, upz in upz_map.items():
-            dist_id = upz.get('district_id')
-            dist_entry = dist_map.get(dist_id)
-            if not dist_entry: continue
-            div_name = div_map.get(dist_entry.get('division_id'), 'অন্যান্য')
-            dist_name = dist_entry.get('bn_name')
-            upz_name = upz.get('bn_name')
-            data_tree.setdefault(div_name, {}).setdefault(dist_name, {})[upz_name] = uni_map.get(upz_id, [])
-        return data_tree
-    except:
-        return {}
-
-BD_DATA = build_bd_data()
-
-# -----------------------------------------------------------------------------
-# DATABASE SCHEMA
-# -----------------------------------------------------------------------------
-DB_COLUMNS = [
-    "Timestamp", "নাম", "যোগাযোগ নম্বর", "পদবী", "কর্মস্থল", 
-    "উৎস বিভাগ", "উৎস জেলা", "উৎস উপজেলা", "উৎস ইউনিয়ন", 
-    "উৎস (Source Name)", "উৎস কোর টাইপ", "উৎস দূরত্ব (KM)", 
-    "গন্তব্য বিভাগ", "গন্তব্য জেলা", "গন্তব্য উপজেলা", "গন্তব্য ইউনিয়ন",
-    "গন্তব্য (Destination Name)", "গন্তব্য কোর টাইপ", "গন্তব্য দূরত্ব (KM)", 
-    "ডিপেন্ডেন্সি (KM)", "পয়েন্টসমূহ"
-]
-
-# -----------------------------------------------------------------------------
-# 2. UI HELPERS
-# -----------------------------------------------------------------------------
-def smart_geo_input(label, options_list, key):
-    opts = ['-- নির্বাচন করুন --'] + (sorted(options_list) if options_list else []) + ['অন্যান্য']
-    choice = st.selectbox(label, opts, key=key)
-    if choice == 'অন্যান্য':
-        return st.text_input(f"অন্যান্য (লিখুন): {label}", key=f"{key}_other")
-    return "" if choice == '-- নির্বাচন করুন --' else choice
-
-# -----------------------------------------------------------------------------
-# 3. PAGE SETUP & DESIGN
+# PAGE SETUP & DESIGN (Moved to top)
 # -----------------------------------------------------------------------------
 st.set_page_config(page_title="ফাইবার কানেকশন জরিপ", page_icon="🖱", layout="wide", initial_sidebar_state="collapsed")
 
@@ -181,6 +105,81 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# -----------------------------------------------------------------------------
+# 1. GEOGRAPHICAL DATA LOADER
+# -----------------------------------------------------------------------------
+NUHIL_RAW = {
+    "divisions": "https://raw.githubusercontent.com/nuhil/bangladesh-geocode/master/divisions/divisions.json",
+    "districts": "https://raw.githubusercontent.com/nuhil/bangladesh-geocode/master/districts/districts.json",
+    "upazilas": "https://raw.githubusercontent.com/nuhil/bangladesh-geocode/master/upazilas/upazilas.json",
+    "unions": "https://raw.githubusercontent.com/nuhil/bangladesh-geocode/master/unions/unions.json",
+}
+
+def fetch_json(url):
+    with urllib.request.urlopen(url, timeout=30) as r:
+        return json.loads(r.read().decode('utf-8'))
+
+@st.cache_data
+def build_bd_data():
+    try:
+        div_raw = fetch_json(NUHIL_RAW['divisions'])
+        dist_raw = fetch_json(NUHIL_RAW['districts'])
+        upz_raw = fetch_json(NUHIL_RAW['upazilas'])
+        uni_raw = fetch_json(NUHIL_RAW['unions'])
+        
+        def extract_data(raw):
+            if isinstance(raw, list):
+                for item in raw:
+                    if isinstance(item, dict) and 'data' in item: return item['data']
+            if isinstance(raw, dict) and 'data' in raw: return raw['data']
+            return []
+
+        divs, dists, upzs, unis = extract_data(div_raw), extract_data(dist_raw), extract_data(upz_raw), extract_data(uni_raw)
+        div_map = {str(d['id']): d.get('bn_name') or d.get('name') for d in divs}
+        dist_map = {str(d['id']): {'bn_name': d.get('bn_name') or d.get('name'), 'division_id': str(d.get('division_id'))} for d in dists}
+        upz_map = {str(u['id']): {'bn_name': u.get('bn_name') or u.get('name'), 'district_id': str(u.get('district_id'))} for u in upzs}
+        
+        uni_map = {}
+        for u in unis:
+            upid = str(u.get('upazilla_id') or u.get('upazila_id') or '')
+            uni_map.setdefault(upid, []).append(u.get('bn_name') or u.get('name'))
+
+        data_tree = {}
+        for upz_id, upz in upz_map.items():
+            dist_id = upz.get('district_id')
+            dist_entry = dist_map.get(dist_id)
+            if not dist_entry: continue
+            div_name = div_map.get(dist_entry.get('division_id'), 'অন্যান্য')
+            dist_name = dist_entry.get('bn_name')
+            upz_name = upz.get('bn_name')
+            data_tree.setdefault(div_name, {}).setdefault(dist_name, {})[upz_name] = uni_map.get(upz_id, [])
+        return data_tree
+    except:
+        return {}
+
+BD_DATA = build_bd_data()
+
+# -----------------------------------------------------------------------------
+# DATABASE SCHEMA
+# -----------------------------------------------------------------------------
+DB_COLUMNS = [
+    "Timestamp", "নাম", "যোগাযোগ নম্বর", "পদবী", "কর্মস্থল", 
+    "উৎস বিভাগ", "উৎস জেলা", "উৎস উপজেলা", "উৎস ইউনিয়ন", 
+    "উৎস (Source Name)", "উৎস কোর টাইপ", "উৎস দূরত্ব (KM)", 
+    "গন্তব্য বিভাগ", "গন্তব্য জেলা", "গন্তব্য উপজেলা", "গন্তব্য ইউনিয়ন",
+    "গন্তব্য (Destination Name)", "গন্তব্য কোর টাইপ", "গন্তব্য দূরত্ব (KM)", 
+    "ডিপেন্ডেন্সি (KM)", "পয়েন্টসমূহ"
+]
+
+# -----------------------------------------------------------------------------
+# 2. UI HELPERS
+# -----------------------------------------------------------------------------
+def smart_geo_input(label, options_list, key):
+    opts = ['-- নির্বাচন করুন --'] + (sorted(options_list) if options_list else []) + ['অন্যান্য']
+    choice = st.selectbox(label, opts, key=key)
+    if choice == 'অন্যান্য':
+        return st.text_input(f"অন্যান্য (লিখুন): {label}", key=f"{key}_other")
+    return "" if choice == '-- নির্বাচন করুন --' else choice
 
 # -----------------------------------------------------------------------------
 # 4. FUNCTION: RENDER SURVEY FORM (User & Admin both can use)
@@ -559,7 +558,7 @@ def main():
             nav_option = st.radio("নেভিগেশন (Navigation)", ["Dashboard", "Survey Form"])
             
             st.markdown("---")
-            if st.button("Log Out"):
+            if st.button("Log Out", key="logout_admin"):
                 st.session_state.authenticated = False
                 st.session_state.user_role = None
                 st.rerun()
@@ -572,7 +571,7 @@ def main():
     else:
         # User Logic (No Sidebar, just Form)
         with st.sidebar:
-             if st.button("Log Out"):
+             if st.button("Log Out", key="logout_user"):
                 st.session_state.authenticated = False
                 st.session_state.user_role = None
                 st.rerun()
